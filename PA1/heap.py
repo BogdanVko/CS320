@@ -14,18 +14,18 @@ def reset_counts():
     global heapify_call_count
     heapify_call_count = 0
 
-    
+
 def swap(A, i, j):
     global swap_count
     swap_count += 1
     A[i], A[j] = A[j], A[i]
 
-    
+
 def count_heapify():
     global heapify_call_count
     heapify_call_count += 1
 
-    
+
 def current_counts():
     return {'swap_count': swap_count, 'heapify_call_count': heapify_call_count}
 
@@ -39,7 +39,7 @@ def readNums(filename):
             print("List read from file {}: {}".format(filename, lst))
         return lst
 
-    
+
 # heaps here are complete binary trees allocated in arrays (0 based)
 def parent(i):
     return (i - 1) // 2
@@ -51,6 +51,7 @@ def left(i):
 
 def right(i):
     return left(i) + 1
+
 
 # END DO NOT MODIFY
 
@@ -73,31 +74,61 @@ def heapify(A, i, n=None):
     MAKE SURE you do this by calling the swap function defined above.
     """
 
-    count_heapify() # This MUST be the first line of the heapify function, don't change it.
+    count_heapify()  # This MUST be the first line of the heapify function, don't change it.
     if n is None:
         n = len(A)
-    if not(i < n):
-        # if asked to heapify an element not below n (the conceptual size of the heap), just return
-        # because no work is required
+
+    if (i >= n):
         return
-    # Your code here
-    
+
+    l = left(i)
+    r = right(i)
+
+    smallest = i  # Initialize largest as root
+
+    if l < n and A[smallest] > A[l]:
+        smallest = l
+
+    if r < n and A[smallest] > A[r]:
+        smallest = r
+
+    if smallest != i:
+        swap(A, i, smallest)
+        heapify(A, smallest)
+
+
+# Your code here
 
 
 def buildHeap(A):
     """Turn the list A (whose elements could be in any order) into a
     heap. Call heapify on all the internal nodes, starting with
     the last internal node, and working backwards to the root."""
-    
+
+    startIdx = len(A) // 2 - 1
+
+    # Perform reverse level order traversal
+    # from last non-leaf node and heapify
+    # each node
+    n = len(A) // 2 - 1
+    while (n >= 0):
+        heapify(A, n)
+        n = n - 1
 
 
 def heapExtractMin(A):
+    min_el = 0
     """Extract the min element from the heap A. Make sure that A
     is a valid heap afterwards. Return the extracted element.
     This operation should perform approximately log_2(len(A))
     comparisons and swaps (heapify calls and swap calls).
     Your implementation should not perform O(n) (linear) work."""
 
+    if len(A) != 0:
+        min_el = A[0]
+        A[0] = A.pop(len(A) - 1)
+        heapify(A, 0)
+    return min_el
 
 
 def heapInsert(A, v):
@@ -108,12 +139,20 @@ def heapInsert(A, v):
     Your implementation should not perform O(n) (linear) work.
     MAKE SURE you swap elements by calling the swap function defined above."""
 
+    # while not_heap:
+
+    A.append(v)
+    counter = len(A) - 1
+
+    while counter != 0 and A[parent(counter)] > A[counter]:
+        swap(A, counter, parent(counter))
+        counter = parent(counter)
 
 
 def printCompleteTree(A):
     """ A handy function provided to you, so you can see a
     complete tree in its proper shape."""
-    
+
     height = int(math.log(len(A), 2))
     width = len(str(max(A)))
     for i in range(height + 1):
@@ -134,7 +173,7 @@ def printCompleteTree(A):
 def shuffled_list(length, seed):
     A = list(range(10, length + 10))
     import random
-    r = random.Random(seed) # pseudo random, so it is repeatable
+    r = random.Random(seed)  # pseudo random, so it is repeatable
     r.shuffle(A)
     return A
 
@@ -172,7 +211,6 @@ def main():
     global db
     if len(sys.argv) > 2:
         db = True
-    
 
     A = shuffled_list(20, 0)
     print("Complete Tree size 20:")
@@ -181,18 +219,18 @@ def main():
     print("Heap size 20:")
     printCompleteTree(A)
 
-
     A = shuffled_list(30, 0)
     report_counts_on_basic_ops(A)
-    
+
     A = shuffled_list(400, 0)
     report_counts_on_basic_ops(A)
-    
+
     A = shuffled_list(10000, 0)
     report_counts_on_basic_ops(A)
 
     A = shuffled_list(100000, 0)
     report_counts_on_basic_ops(A, 3, 3)
+
 
 if __name__ == "__main__":
     main()
